@@ -63,6 +63,9 @@ function ethiopiaregions_load_regions() {
     ]);
   }
 
+  // Increase the length of civicrm_county.name to 128 chars (was 64)
+  CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_county CHANGE name name varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Name of County'");
+
   // Get all the state_provinces
   $stateProvince = CRM_Core_PseudoConstant::stateProvinceForCountry($country_id, FALSE);
 
@@ -95,13 +98,13 @@ function ethiopiaregions_load_regions() {
     $county_name = $row[1] . ', ' . $row[2];
 
     $county_id = CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_county WHERE name = %1 AND state_province_id = %2', [
-      1 => [$row[1], 'String'],
+      1 => [$county_name, 'String'],
       2 => [$state_province_id, 'Positive'],
     ]);
 
     if (!$county_id) {
       CRM_Core_DAO::executeQuery('INSERT INTO civicrm_county(name, state_province_id) VALUES (%1, %2)', [
-        1 => [$row[1], 'String'],
+        1 => [$county_name, 'String'],
         2 => [$state_province_id, 'Positive'],
       ]);
     }
